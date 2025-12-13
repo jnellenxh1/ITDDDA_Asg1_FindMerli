@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "20151919884",
+    "firebase_url": "https://assg1-cb495-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "assg1-cb495",
+    "storage_bucket": "assg1-cb495.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20151919884:android:a5140cc1aebc1dc15d5529",
+        "android_client_info": {
+          "package_name": "com.np.FindMerli"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeu3sTQW6YDOgZDqhZ6k7Oti8t3dWEUV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
