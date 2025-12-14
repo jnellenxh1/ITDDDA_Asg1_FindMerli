@@ -5,11 +5,13 @@ public class UserData
     public string email;
     public string userId;
     public string createdAt;
+    public int knowledgePoints;
 
     public UserData(string username, string email, string userId)
     {
         this.username = username;
         this.email = email;
         this.userId = userId;
+        this.knowledgePoints = 0;
     }
 }
