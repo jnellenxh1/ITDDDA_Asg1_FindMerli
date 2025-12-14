@@ -13,6 +13,7 @@ public class DialogueManager : MonoBehaviour
     public GameObject quizPanel;
     public TMP_Text questionText;
     public Button[] answerButtons;
+    public GameObject correctStampImage;
 
     private PosterContent currentPosterContent;
     private int currentDialogueIndex = 0;
@@ -33,9 +34,6 @@ public class DialogueManager : MonoBehaviour
 
     public void OnAnswerSelected(int answerIndex)
 {
-    // Ensure you have a reference to the Text component showing the question.
-    // e.g., public TextMeshProUGUI questionText;
-    
     int correctIndex = currentPosterContent.correctAnswerIndex; 
 
     // --- The primary logic change goes here ---
@@ -43,6 +41,8 @@ public class DialogueManager : MonoBehaviour
     {
         // 1. Show Success Feedback
         questionText.text = "Correct! History unlocked!"; 
+
+        correctStampImage.SetActive(true);
         
         // 2. Disable all buttons (optional, but good practice)
         SetAnswerButtonsInteractable(false); 
@@ -64,16 +64,11 @@ public class DialogueManager : MonoBehaviour
 
 private IEnumerator CloseQuizAfterDelay(float delay)
 {
-    // Wait for the specified time (e.g., 2 seconds)
     yield return new WaitForSeconds(delay); 
     
-    // Close the quiz UI
     quizPanel.SetActive(false); 
     
-    // Reset all answer buttons to be interactable for the NEXT quiz
     SetAnswerButtonsInteractable(true); 
-    
-    // OPTIONAL: Hide the Merlion prefab if you want it to disappear after the quiz.
 }
 
 private void SetAnswerButtonsInteractable(bool state)
