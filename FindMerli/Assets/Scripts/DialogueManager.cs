@@ -13,6 +13,7 @@ public class DialogueManager : MonoBehaviour
     public GameObject quizPanel;
     public TMP_Text questionText;
     public Button[] answerButtons;
+    public GameObject correctStampImage;
 
     private PosterContent currentPosterContent;
     private int currentDialogueIndex = 0;
@@ -44,6 +45,7 @@ public class DialogueManager : MonoBehaviour
         // 1. Show Success Feedback
         questionText.text = "Correct! History unlocked!"; 
         
+        correctStampImage.SetActive(true);
         // 2. Disable all buttons (optional, but good practice)
         SetAnswerButtonsInteractable(false); 
         
