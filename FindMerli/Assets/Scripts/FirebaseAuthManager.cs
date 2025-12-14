@@ -111,60 +111,131 @@ public class FirebaseAuthManager : MonoBehaviour
         }
     }
 
-    private IEnumerator UpdateUsernameAndSaveToDatabase(string username)
+private IEnumerator UpdateUsernameAndSaveToDatabase(string username)
+{
+    // Update display name in Firebase Auth
+    UserProfile profile = new UserProfile
     {
-        // Update display name in Firebase Auth
-        UserProfile profile = new UserProfile
-        {
-            DisplayName = username
-        };
+        DisplayName = username
+    };
 
-        var profileTask = user.UpdateUserProfileAsync(profile);
+    var profileTask = user.UpdateUserProfileAsync(profile);
 
-        yield return new WaitUntil(() => profileTask.IsCompleted);
+    yield return new WaitUntil(() => profileTask.IsCompleted);
 
-        if (profileTask.Exception != null)
-        {
-            Debug.LogError("Failed to set username: " + profileTask.Exception.Message);
-        }
-        else
-        {
-            Debug.Log($"Username set to: {username}");
-        }
-
-        // Save user data to Realtime Database
-        yield return StartCoroutine(SaveUserToDatabase(username));
+    if (profileTask.Exception != null)
+    {
+        Debug.LogError("Failed to set username: " + profileTask.Exception.Message);
+    }
+    else
+    {
+        Debug.Log($"Username set to: {username}");
     }
 
-    private IEnumerator SaveUserToDatabase(string username)
+    // Save user data to Realtime Database
+    yield return StartCoroutine(SaveUserToDatabase(username));
+}
+
+private IEnumerator SaveUserToDatabase(string username)
+{
+    Debug.Log("Saving user to Realtime Database...");
+
+    // Save each field individually using Child().SetValueAsync()
+    var usernameTask = database.Child("users").Child(user.UserId).Child("username").SetValueAsync(username);
+    yield return new WaitUntil(() => usernameTask.IsCompleted);
+
+    var emailTask = database.Child("users").Child(user.UserId).Child("email").SetValueAsync(user.Email);
+    yield return new WaitUntil(() => emailTask.IsCompleted);
+
+    var userIdTask = database.Child("users").Child(user.UserId).Child("userId").SetValueAsync(user.UserId);
+    yield return new WaitUntil(() => userIdTask.IsCompleted);
+
+    var createdAtTask = database.Child("users").Child(user.UserId).Child("createdAt").SetValueAsync(System.DateTime.UtcNow.ToString("o"));
+    yield return new WaitUntil(() => createdAtTask.IsCompleted);
+
+    var pointsTask = database.Child("users").Child(user.UserId).Child("knowledgePoints").SetValueAsync(0);
+    yield return new WaitUntil(() => pointsTask.IsCompleted);
+
+    // Check for errors
+    if (usernameTask.Exception != null || emailTask.Exception != null || 
+        userIdTask.Exception != null || createdAtTask.Exception != null || 
+        pointsTask.Exception != null)
     {
-        Debug.Log("Saving user to Realtime Database...");
+        Debug.LogError("Failed to save user to database");
+    }
+    else
+    {
+        Debug.Log("User data saved to Realtime Database successfully!");
+        
+        // Initialize stamps after user data is saved
+        yield return StartCoroutine(InitializeUserStamps());
+    }
 
-        // Create user data object
-        UserData userData = new UserData(username, user.Email, user.UserId);
+    // Wait 2 seconds then load homepage scene
+    yield return new WaitForSeconds(2f);
+    SceneManager.LoadScene("Home Page"); 
+}
 
-        // Convert to JSON
-        string json = JsonUtility.ToJson(userData);
+private IEnumerator InitializeUserStamps()
+{
+    Debug.Log("Initializing stamps for new user...");
 
-        Debug.Log($"User data JSON: {json}");
+    // Define all stamps
+    string[] stampIds = new string[]
+    {
+        "stamp_marina_bay",
+        "stamp_chinatown",
+        "stamp_little_india",
+        "stamp_kampong_glam",
+        "stamp_sentosa"
+    };
 
-        // Save to Realtime Database under "users/{userId}"
-        var saveTask = database.Child("users").Child(user.UserId).SetRawJsonValueAsync(json);
+    string[] locationNames = new string[]
+    {
+        "Marina Bay",
+        "Chinatown",
+        "Little India",
+        "Kampong Glam",
+        "Sentosa"
+    };
 
-        yield return new WaitUntil(() => saveTask.IsCompleted);
+    // Save each stamp individually
+    for (int i = 0; i < stampIds.Length; i++)
+    {
+        string stampId = stampIds[i];
+        string locationName = locationNames[i];
 
-        if (saveTask.Exception != null)
+        // Set collected to false
+        var collectedTask = database.Child("users").Child(user.UserId)
+            .Child("stamps").Child(stampId).Child("collected").SetValueAsync(false);
+        yield return new WaitUntil(() => collectedTask.IsCompleted);
+
+        // Set timestamp to empty string
+        var timestampTask = database.Child("users").Child(user.UserId)
+            .Child("stamps").Child(stampId).Child("timestamp").SetValueAsync("");
+        yield return new WaitUntil(() => timestampTask.IsCompleted);
+
+        // Set location name
+        var locationTask = database.Child("users").Child(user.UserId)
+            .Child("stamps").Child(stampId).Child("locationName").SetValueAsync(locationName);
+        yield return new WaitUntil(() => locationTask.IsCompleted);
+
+        if (collectedTask.Exception != null || timestampTask.Exception != null || locationTask.Exception != null)
         {
-            Debug.LogError("Failed to save user to database: " + saveTask.Exception.Message);
+            Debug.LogError($"Failed to initialize stamp: {stampId}");
         }
         else
         {
-            Debug.Log("User data saved to Realtime Database successfully!");
+            Debug.Log($"Stamp initialized: {stampId}");
         }
+    }
+
+    Debug.Log("All stamps initialized successfully!");
+    {
 
         // Wait 2 seconds then load homepage scene
         yield return new WaitForSeconds(2f);
         SceneManager.LoadScene("Home Page"); 
     }
-
+    }
 }
