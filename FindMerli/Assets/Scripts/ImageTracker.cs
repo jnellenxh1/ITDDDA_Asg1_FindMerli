@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-
 public class ImageTracker : MonoBehaviour
 {
     [SerializeField]
@@ -12,7 +11,17 @@ public class ImageTracker : MonoBehaviour
     [SerializeField]
     private GameObject[] placeablePrefabs;
 
+    [Header("Dialogue and Quiz System")]
+    [SerializeField]
+    private DialogueManager dialogueManager; // Assign your DialogueManager here
+
+    [SerializeField]
+    private PosterContent[] allPosterContent; // Assign all 10 ScriptableObjects here
+
+    private Dictionary<string, PosterContent> contentMap = new Dictionary<string, PosterContent>();
+    
     private Dictionary<string, GameObject> spawnedPrefabs = new Dictionary<string, GameObject>();
+    private Dictionary<GameObject, GameObject> spawnedObjects = new Dictionary<GameObject, GameObject>();
 
     private void Start()
     {
@@ -20,17 +29,28 @@ public class ImageTracker : MonoBehaviour
         {
             trackedImageManager.trackablesChanged.AddListener(OnImageChanged);
             SetupPrefabs();
+            SetupContentMap(); // NEW call
         }
     }
-
+    
+    // --- NEW METHOD ---
+    void SetupContentMap()
+    {
+        foreach (PosterContent content in allPosterContent)
+        {
+            // Key = the name of the reference image in the AR Reference Image Library
+            contentMap.Add(content.imageName, content); 
+        }
+    }
     void SetupPrefabs()
     {
         foreach (GameObject prefab in placeablePrefabs)
         {
-            GameObject newPrefab = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            GameObject newPrefab = Instantiate(prefab);
             newPrefab.name = prefab.name;
             newPrefab.SetActive(false);
             spawnedPrefabs.Add(prefab.name, newPrefab);
+            spawnedObjects.Add(newPrefab, prefab);
         }
     }
 
@@ -53,38 +73,41 @@ public class ImageTracker : MonoBehaviour
     }
 
     void UpdateImage(ARTrackedImage trackedImage)
-{
-    if (trackedImage != null)
     {
-        GameObject prefab = spawnedPrefabs[trackedImage.referenceImage.name];
+        string imageName = trackedImage.referenceImage.name;
 
-        if (trackedImage.trackingState == TrackingState.Limited || trackedImage.trackingState == TrackingState.None)
+        if (trackedImage.trackingState == TrackingState.Tracking)
         {
-            // When tracking is lost, simply hide it
-            prefab.SetActive(false);
+            // Your existing code to position and enable the Merlion prefab
+            if(spawnedPrefabs[imageName].transform.parent != trackedImage.transform)
+            {
+                spawnedPrefabs[imageName].transform.SetParent(trackedImage.transform);
+                spawnedPrefabs[imageName].transform.localPosition = spawnedObjects[spawnedPrefabs[imageName]].transform.localPosition;
+                spawnedPrefabs[imageName].transform.localRotation = spawnedObjects[spawnedPrefabs[imageName]].transform.localRotation;
+                spawnedPrefabs[imageName].SetActive(true);
+
+                // --- NEW LOGIC: START DIALOGUE ---
+                if (contentMap.ContainsKey(imageName))
+                {
+                    Debug.Log("Tracking: " + imageName + ". Starting dialogue.");
+                    dialogueManager.StartDialogue(contentMap[imageName]);
+                }
+                // ----------------------------------
+            }
         }
-        else if (trackedImage.trackingState == TrackingState.Tracking)
+        else // Limited or None tracking state
         {
-            // Get the Animator script attached to the Merlion prefab
-            MerlionAnimator animator = prefab.GetComponent<MerlionAnimator>();
-
-            if (animator != null)
+            // Your existing code to disable the content
+            spawnedPrefabs[imageName].transform.SetParent(null);
+            spawnedPrefabs[imageName].SetActive(false);
+            
+            // --- NEW LOGIC: HIDE UI ---
+            if (dialogueManager.dialoguePanel.activeSelf || dialogueManager.quizPanel.activeSelf)
             {
-                // **NEW LOGIC: Start the animation on the animator script**
-                // The animator script handles the position and scale over time.
-                animator.StartEntranceAnimation(trackedImage.transform.position);
-
-                // Note: We MUST set the rotation directly so the object faces the right way
-                prefab.transform.rotation = trackedImage.transform.rotation;
+                 dialogueManager.dialoguePanel.SetActive(false);
+                 dialogueManager.quizPanel.SetActive(false);
             }
-            else
-            {
-                // Fallback (if the animator script is missing)
-                prefab.transform.position = trackedImage.transform.position;
-                prefab.transform.rotation = trackedImage.transform.rotation;
-                prefab.SetActive(true);
-            }
+            // --------------------------
         }
     }
-}
 }

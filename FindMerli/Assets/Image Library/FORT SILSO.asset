@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01116ddc9b94a2d46b934ad7c710d896, type: 3}
+  m_Name: FORT SILSO
+  m_EditorClassIdentifier: 
+  imageName: FORT SILSO
+  dialogueLines:
+  - Ahoy there! Welcome to Fort Siloso. This place is a treasure trove of Singapore's
+    military history!
+  - Built in the late 19th century, Siloso was one of the 12 coastal batteries that
+    formed the "Fortress Singapore" defense line.
+  - Its main job was to protect the western entrance to Singapore's port and the
+    naval base. It was armed with powerful guns ready to fire at enemy ships.
+  - But the most pivotal moment for the Fort was during World War II in 1942, when
+    the Japanese attacked.
+  - The guns here were designed to fire out to sea, but when the Japanese invaded
+    from the land, the Fort's defenses had to be rapidly turned inwards to face the
+    jungle!
+  - "After the war, Fort Siloso was preserved and later opened as a military museum.
+    It\u2019s the only coastal fort in Singapore still standing today!"
+  quizQuestion: What was Fort Siloso's original primary role as part of the "Fortress
+    Singapore" defense line?
+  answerOptions:
+  - To defend Singapore's reservoirs and fresh water supply.
+  - To protect the western port entrance and naval base.
+  - To house the main headquarters for British military planning.
+  - To act as a lookout for incoming enemy aircraft.
+  correctAnswerIndex: 1
