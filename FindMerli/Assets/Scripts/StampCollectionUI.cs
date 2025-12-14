@@ -21,11 +21,9 @@ public class StampCollectionUI : MonoBehaviour
     // Define all stamps that exist in your game
     private List<StampInfo> allStamps = new List<StampInfo>
     {
-        new StampInfo("stamp_marina_bay", "Marina Bay"),
-        new StampInfo("stamp_chinatown", "Chinatown"),
-        new StampInfo("stamp_little_india", "Little India"),
-        new StampInfo("stamp_kampong_glam", "Kampong Glam"),
-        new StampInfo("stamp_sentosa", "Sentosa")
+        new StampInfo("stamp_fort_siloso", "Fort Siloso"),
+        new StampInfo("stamp_fullerton", "Fullerton"),
+        new StampInfo("stamp_istana", "Istana"),
     };
 
     void Start()

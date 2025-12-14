@@ -44,6 +44,7 @@ public class DialogueManager : MonoBehaviour
 
         correctStampImage.SetActive(true);
         
+        correctStampImage.SetActive(true);
         // 2. Disable all buttons (optional, but good practice)
         SetAnswerButtonsInteractable(false); 
         
