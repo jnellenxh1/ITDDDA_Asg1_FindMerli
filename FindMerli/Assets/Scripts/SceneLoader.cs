@@ -3,12 +3,10 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
-
-    /// <summary>
-    /// Loads a scene by its name
-    /// </summary>
+    // Public function to be called by the Home Page 'Scan' button
     public void LoadSceneByName(string sceneName)
     {
+        // Check if the scene name is valid before loading (optional but good)
         if (SceneUtility.GetBuildIndexByScenePath(sceneName) != -1)
         {
             SceneManager.LoadScene(sceneName);

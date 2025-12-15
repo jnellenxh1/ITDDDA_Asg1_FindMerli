@@ -19,17 +19,20 @@ public class FirebaseLoginManager : MonoBehaviour
 
     private void Start()
     {
+        // Initialize Firebase
         StartCoroutine(InitializeFirebase());
     }
 
     private IEnumerator InitializeFirebase()
     {
+        // Check if Firebase is ready
         var dependencyTask = FirebaseApp.CheckAndFixDependenciesAsync();
         
         yield return new WaitUntil(() => dependencyTask.IsCompleted);
 
         if (dependencyTask.Result == DependencyStatus.Available)
         {
+            // Firebase is ready
             auth = FirebaseAuth.DefaultInstance;
             database = FirebaseDatabase.DefaultInstance.RootReference;
             Debug.Log("Firebase initialized successfully for Login");
@@ -40,14 +43,13 @@ public class FirebaseLoginManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called when the Login button is clicked
-    /// </summary>
     public void OnLoginButtonClicked()
     {
+        // Get input values
         string email = emailInput.text.Trim();
         string password = passwordInput.text;
 
+        // Validate inputs
         if (string.IsNullOrEmpty(email))
         {
             Debug.Log("Please enter an email");
@@ -60,20 +62,22 @@ public class FirebaseLoginManager : MonoBehaviour
             return;
         }
 
+        // Start login process
         StartCoroutine(Login(email, password));
     }
 
-    /// <summary>
-    /// Handles user login with firebase authentication
-    /// </summary>
     private IEnumerator Login(string email, string password)
     {
+        Debug.Log("Attempting to log in...");
+
+        // Sign in with email and password
         var loginTask = auth.SignInWithEmailAndPasswordAsync(email, password);
 
         yield return new WaitUntil(() => loginTask.IsCompleted);
 
         if (loginTask.Exception != null)
         {
+            // Login failed - handle errors
             Debug.LogError("Login failed: " + loginTask.Exception.Message);
             
             FirebaseException firebaseEx = loginTask.Exception.GetBaseException() as FirebaseException;
@@ -103,26 +107,27 @@ public class FirebaseLoginManager : MonoBehaviour
         }
         else
         {
+            // Login successful
             user = loginTask.Result.User;
             Debug.Log($"User logged in successfully: {user.Email}");
             Debug.Log($"User ID: {user.UserId}");
             
+            // Get username from Auth profile
             if (!string.IsNullOrEmpty(user.DisplayName))
             {
                 Debug.Log($"Welcome back, {user.DisplayName}!");
             }
 
+            // Retrieve user data from database
             yield return StartCoroutine(LoadUserData());
         }
     }
 
-    /// <summary>
-    /// Loads user data from the firebase realtime database
-    /// </summary>
     private IEnumerator LoadUserData()
     {
         Debug.Log("Loading user data from database...");
 
+        // Get user data from Realtime Database
         var dataTask = database.Child("users").Child(user.UserId).GetValueAsync();
 
         yield return new WaitUntil(() => dataTask.IsCompleted);
@@ -148,13 +153,14 @@ public class FirebaseLoginManager : MonoBehaviour
             Debug.Log($"  Email: {email}");
             Debug.Log($"  Account created: {createdAt}");
             
+            // You can store this data for use in your app
             PlayerPrefs.SetString("CurrentUsername", username);
             PlayerPrefs.SetString("CurrentEmail", email);
             PlayerPrefs.SetString("CurrentUserId", user.UserId);
             PlayerPrefs.Save();
         }
 
-    {
+    { // Wait 1 second then load homepage scene
         yield return new WaitForSeconds(1f);
         SceneManager.LoadScene("Home Page");
     }
