@@ -11,37 +11,45 @@ public class ImageTracker : MonoBehaviour
     [SerializeField]
     private GameObject[] placeablePrefabs;
 
-    [Header("Dialogue and Quiz System")]
     [SerializeField]
-    private DialogueManager dialogueManager; // Assign your DialogueManager here
+    private DialogueManager dialogueManager;
 
     [SerializeField]
-    private PosterContent[] allPosterContent; // Assign all 10 ScriptableObjects here
+    private PosterContent[] allPosterContent;
 
     private Dictionary<string, PosterContent> contentMap = new Dictionary<string, PosterContent>();
     
     private Dictionary<string, GameObject> spawnedPrefabs = new Dictionary<string, GameObject>();
     private Dictionary<GameObject, GameObject> spawnedObjects = new Dictionary<GameObject, GameObject>();
 
+    /// <summary>
+    /// Called when the script instance is being loaded
+    /// Initializes the image tracking and sets up prefabs and content mapping
+    /// </summary>
     private void Start()
     {
         if (trackedImageManager != null)
         {
             trackedImageManager.trackablesChanged.AddListener(OnImageChanged);
             SetupPrefabs();
-            SetupContentMap(); // NEW call
+            SetupContentMap();
         }
     }
-    
-    // --- NEW METHOD ---
+
+    /// <summary>
+    /// Sets up the mapping between image names and their corresponding poster content
+    /// </summary>
     void SetupContentMap()
     {
         foreach (PosterContent content in allPosterContent)
         {
-            // Key = the name of the reference image in the AR Reference Image Library
             contentMap.Add(content.imageName, content); 
         }
     }
+
+    /// <summary>
+    /// Sets up the prefabs for image tracking
+    /// </summary>
     void SetupPrefabs()
     {
         foreach (GameObject prefab in placeablePrefabs)
@@ -54,6 +62,9 @@ public class ImageTracker : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Called when the tracked images change (added, updated, removed)
+    /// </summary>
     void OnImageChanged(ARTrackablesChangedEventArgs<ARTrackedImage> eventArgs)
     {
         foreach (ARTrackedImage trackedImage in eventArgs.added)
@@ -72,6 +83,9 @@ public class ImageTracker : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates the image tracking state and manages the associated prefab and dialogue
+    /// </summary>
     void UpdateImage(ARTrackedImage trackedImage)
     {
         string imageName = trackedImage.referenceImage.name;
@@ -86,28 +100,23 @@ public class ImageTracker : MonoBehaviour
                 spawnedPrefabs[imageName].transform.localRotation = spawnedObjects[spawnedPrefabs[imageName]].transform.localRotation;
                 spawnedPrefabs[imageName].SetActive(true);
 
-                // --- NEW LOGIC: START DIALOGUE ---
                 if (contentMap.ContainsKey(imageName))
                 {
                     Debug.Log("Tracking: " + imageName + ". Starting dialogue.");
                     dialogueManager.StartDialogue(contentMap[imageName]);
                 }
-                // ----------------------------------
             }
         }
-        else // Limited or None tracking state
+        else
         {
-            // Your existing code to disable the content
             spawnedPrefabs[imageName].transform.SetParent(null);
             spawnedPrefabs[imageName].SetActive(false);
-            
-            // --- NEW LOGIC: HIDE UI ---
+
             if (dialogueManager.dialoguePanel.activeSelf || dialogueManager.quizPanel.activeSelf)
             {
                  dialogueManager.dialoguePanel.SetActive(false);
                  dialogueManager.quizPanel.SetActive(false);
             }
-            // --------------------------
         }
     }
 }

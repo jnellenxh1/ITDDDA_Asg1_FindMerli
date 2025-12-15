@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01116ddc9b94a2d46b934ad7c710d896, type: 3}
+  m_Name: FULLERTON
+  m_EditorClassIdentifier: 
+  imageName: FULLERTON
+  dialogueLines:
+  - Welcome, traveler! You've found one of Singapore's most majestic landmarks. Before
+    you stands The Fullerton Hotel.
+  - This building wasn't always a luxury hotel, though! It was originally known as
+    the Fullerton Building and opened in 1928.
+  - For decades, its most important tenant was the General Post Office (GPO). Imagine
+    all the letters and parcels that passed through those doors!
+  - The structure itself is a powerful example of neoclassical architecture, easily
+    recognized by its towering Doric columns.
+  - "It also holds a significant place in our nation's history. This very site was
+    where the official proclamation of Singapore\u2019s independence took place in
+    1965."
+  - Now, are you ready to test your knowledge about this iconic building?
+  quizQuestion: What was the primary and most significant tenant housed in the Fullerton
+    Building when it first opened in 1928??
+  answerOptions:
+  - The General Post Office (GPO)
+  - The Singapore Naval Headquarters
+  - The Colonial Treasury Department
+  - The Singapore Stock Exchange
+  correctAnswerIndex: 0
